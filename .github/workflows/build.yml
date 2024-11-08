@@ -3,57 +3,34 @@ name: Build packages
 on:
   push:
     tags:
-      - 'v*'
+      - v*
 
 jobs:
   build:
     name: Build podkop and luci-app-podkop
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4.2.1
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          buildkitd-flags: --debug
 
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-            
-      - name: Build packages
+      - name: Build and push
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
           tags: podkop:ci
-          outputs: type=local,dest=./artifacts
-          cache-from: type=gha,scope=${{ github.workflow }}
-          cache-to: type=gha,scope=${{ github.workflow }},mode=max
-          push: false
-          
-      - name: Check build artifacts
+
+      - name: Create Docker container
+        run: docker create --name podkop podkop:ci
+
+      - name: Copy file from Docker container
         run: |
-          ls -la ./artifacts/builder/bin/packages/x86_64/utilites/ || true
-          ls -la ./artifacts/builder/bin/packages/x86_64/luci/ || true
-          
-      - name: Upload artifacts
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: packages
-          path: |
-            ./artifacts/builder/bin/packages/x86_64/utilites/*.ipk
-            ./artifacts/builder/bin/packages/x86_64/luci/*.ipk
-          
+          docker cp podkop:/builder/bin/packages/x86_64/utilites/. ./bin/
+          docker cp podkop:/builder/bin/packages/x86_64/luci/. ./bin/
+
+      - name: Remove Docker container
+        run: docker rm podkop
+
       - name: Release
-        if: success()
         uses: softprops/action-gh-release@v2.0.8
         with:
-          files: |
-            ./artifacts/builder/bin/packages/x86_64/utilites/*.ipk
-            ./artifacts/builder/bin/packages/x86_64/luci/*.ipk
-          generate_release_notes: true
+          files: ./bin/*.ipk
