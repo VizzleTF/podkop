@@ -4,11 +4,6 @@ FROM openwrt/sdk:x86_64-v23.05.5
 RUN mkdir -p /builder/package/feeds/utilites/ \
     /builder/package/feeds/luci/
 
-# Create feeds.conf with correct versions
-RUN echo 'src-git-full base https://git.openwrt.org/openwrt/openwrt.git;v23.05.5' > /builder/feeds.conf && \
-    echo 'src-git-full packages https://git.openwrt.org/feed/packages.git;openwrt-23.05' >> /builder/feeds.conf && \
-    echo 'src-git-full luci https://git.openwrt.org/project/luci.git;openwrt-23.05' >> /builder/feeds.conf
-
 # Update and install specific feeds
 RUN ./scripts/feeds update -a && \
     ./scripts/feeds install -f -p base -a && \
