@@ -1,28 +1,15 @@
 include $(TOPDIR)/rules.mk
 
-LUCI_LANG.ru=Русский
+PKG_NAME:=luci-i18n-podkop-ru
+PKG_VERSION:=$(PKG_VERSION)
 
-LUCI_BASENAME:=podkop
+PKG_LICENSE:=MIT
+PKG_MAINTAINER:=Ivan K <vizzlef@gmail.com>
 
+LUCI_TITLE:=LuCI Podkop application Russian translation
+LUCI_DEPENDS:=+luci-app-podkop
 LUCI_PKGARCH:=all
 
-include $(INCLUDE_DIR)/package.mk
+include $(TOPDIR)/feeds/luci/luci.mk
 
-define Package/luci-i18n-podkop-ru
-  SECTION:=luci
-  CATEGORY:=LuCI
-  TITLE:=Русский перевод для luci-app-podkop
-  DEPENDS:=luci-app-podkop
-  PKGARCH:=all
-endef
-
-define Package/luci-i18n-podkop-ru/description
-  Русский перевод для luci-app-podkop
-endef
-
-define Package/luci-i18n-podkop-ru/install
-  $(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n/
-  $(INSTALL_DATA) $(PKG_BUILD_DIR)/podkop.ru.lmo $(1)/usr/lib/lua/luci/i18n/podkop.ru.lmo
-endef
-
-$(eval $(call BuildPackage,luci-i18n-podkop-ru))
+# call BuildPackage - OpenWrt buildroot signature
