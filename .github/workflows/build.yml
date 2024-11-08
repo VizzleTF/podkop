@@ -2,8 +2,10 @@ name: Build packages
 
 on:
   push:
+    branches:
+      - '**'  # Для любой ветки
     tags:
-      - v*
+      - 'v*'  # Сохраняем триггер для тегов
 
 jobs:
   build:
@@ -24,13 +26,17 @@ jobs:
 
       - name: Copy file from Docker container
         run: |
+          mkdir -p ./bin/
           docker cp podkop:/builder/bin/packages/x86_64/utilites/. ./bin/
           docker cp podkop:/builder/bin/packages/x86_64/luci/. ./bin/
+          # Проверяем наличие файлов переводов
+          ls -la ./bin/
 
       - name: Remove Docker container
         run: docker rm podkop
 
       - name: Release
         uses: softprops/action-gh-release@v2.0.8
+        if: startsWith(github.ref, 'refs/tags/v')  # Релиз только для тегов
         with:
           files: ./bin/*.ipk
