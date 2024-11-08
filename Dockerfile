@@ -13,8 +13,8 @@ COPY ./podkop /builder/package/feeds/utilites/podkop
 COPY ./luci-app-podkop /builder/package/feeds/luci/luci-app-podkop
 
 # Configure build with minimal options
-RUN cp .config .config.orig && \
-    echo 'CONFIG_PACKAGE_luci-base=y' > .config && \
+RUN make defconfig && \
+    echo 'CONFIG_PACKAGE_luci-base=y' >> .config && \
     echo 'CONFIG_PACKAGE_podkop=y' >> .config && \
     echo 'CONFIG_PACKAGE_luci-app-podkop=y' >> .config && \
     make defconfig
