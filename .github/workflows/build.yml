@@ -2,10 +2,8 @@ name: Build packages
 
 on:
   push:
-    branches:
-      - '**'  # Для любой ветки
     tags:
-      - 'v*'  # Сохраняем триггер для тегов
+      - 'v*'
 
 jobs:
   build:
@@ -14,7 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.1
         
-      # Подготовка директории для артефактов
       - name: Create bin directory
         run: mkdir -p ./bin
         

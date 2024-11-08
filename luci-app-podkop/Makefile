@@ -8,7 +8,7 @@ PKG_VERSION:=0.2.3
 PKG_RELEASE:=1
 
 LUCI_TITLE:=LuCI podkop app
-LUCI_DEPENDS:=+luci-base +podkop
+LUCI_DEPENDS:=+luci-base +liblua +libnl-tiny +podkop
 LUCI_PKGARCH:=all
 LUCI_DESCRIPTION:=Domain routing. Use of VLESS, Shadowsocks technologies
 
