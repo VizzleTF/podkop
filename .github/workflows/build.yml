@@ -11,32 +11,33 @@ jobs:
   build:
     name: Build podkop and luci-app-podkop
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4.2.1
-
+        
+      # Подготовка директории для артефактов
+      - name: Create bin directory
+        run: mkdir -p ./bin
+        
       - name: Build and push
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
           tags: podkop:ci
-
+          
       - name: Create Docker container
         run: docker create --name podkop podkop:ci
-
-      - name: Copy file from Docker container
+        
+      - name: Copy files from Docker container
         run: |
-          mkdir -p ./bin/
           docker cp podkop:/builder/bin/packages/x86_64/utilites/. ./bin/
           docker cp podkop:/builder/bin/packages/x86_64/luci/. ./bin/
-          # Проверяем наличие файлов переводов
-          ls -la ./bin/
-
+          
       - name: Remove Docker container
         run: docker rm podkop
-
+        
       - name: Release
         uses: softprops/action-gh-release@v2.0.8
-        if: startsWith(github.ref, 'refs/tags/v')  # Релиз только для тегов
         with:
-          files: ./bin/*.ipk
+          files: |
+            ./bin/*.ipk
+          generate_release_notes: true
