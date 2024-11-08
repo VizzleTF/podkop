@@ -78,7 +78,7 @@ msgid "Predefined Domain Lists"
 msgstr ""
 
 #: applications/luci-app-podkop/htdocs/luci-static/resources/view/podkop/podkop.js:0
-msgid "Enable routing based on predefined domain lists for specific regions\n<a href="https://github.com/itdoginfo/allow-domains" target="_blank">github.com/itdoginfo/allow-domains</a>"
+msgid "Enable routing based on predefined domain lists for specific regions"
 msgstr ""
 
 #: applications/luci-app-podkop/htdocs/luci-static/resources/view/podkop/podkop.js:0

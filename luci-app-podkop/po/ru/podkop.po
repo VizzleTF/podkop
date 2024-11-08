@@ -28,8 +28,8 @@ msgstr "Выберите сетевой интерфейс для VPN подкл
 msgid "Predefined Domain Lists"
 msgstr "Предустановленные списки доменов"
 
-msgid "Enable routing based on predefined domain lists for specific regions\n<a href="https://github.com/itdoginfo/allow-domains" target="_blank">github.com/itdoginfo/allow-domains</a>"
-msgstr "Включить маршрутизацию на основе предустановленных списков доменов для определенных регионов\n<a href="https://github.com/itdoginfo/allow-domains" target="_blank">github.com/itdoginfo/allow-domains</a>"
+msgid "Enable routing based on predefined domain lists for specific regions"
+msgstr "Включить маршрутизацию на основе предустановленных списков доменов для определенных регионов"
 
 msgid "Domain List"
 msgstr "Список доменов"
