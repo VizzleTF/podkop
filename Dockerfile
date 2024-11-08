@@ -33,18 +33,14 @@ COPY ./podkop /builder/package/feeds/utilites/podkop
 COPY ./luci-app-podkop /builder/package/feeds/luci/luci-app-podkop
 
 # Build packages with maximum debugging
-RUN make V=sc package/lua/compile && \
-    make V=sc package/lua/install && \
+RUN set -e && \
+    make V=sc package/lua/compile && \
     make V=sc package/libnl-tiny/compile && \
-    make V=sc package/libnl-tiny/install && \
     make V=sc package/rpcd/compile && \
-    make V=sc package/rpcd/install && \
     make V=sc package/cgi-io/compile && \
-    make V=sc package/cgi-io/install && \
     make V=sc package/luci-base/compile && \
-    make V=sc package/luci-base/install && \
-    make V=sc -j$(nproc) package/podkop/compile && \
-    make V=sc -j$(nproc) package/luci-app-podkop/compile
+    make V=sc -j1 package/podkop/compile && \
+    make V=sc -j1 package/luci-app-podkop/compile
 
 # Clean up unnecessary files
 RUN rm -rf /builder/build_dir/target* \
