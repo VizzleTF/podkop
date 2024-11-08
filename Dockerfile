@@ -1,6 +1,6 @@
 FROM openwrt/sdk:x86_64-v23.05.5
 
-# Обновляем фиды и создаем директории
+# Обновляем и устанавливаем фиды
 RUN ./scripts/feeds update -a && \
     ./scripts/feeds install -a && \
     mkdir -p /builder/package/feeds/utilites/ && \
@@ -10,8 +10,8 @@ RUN ./scripts/feeds update -a && \
 COPY ./podkop /builder/package/feeds/utilites/podkop
 COPY ./luci-app-podkop /builder/package/feeds/luci/luci-app-podkop
 
-# Собираем все необходимые инструменты и пакеты
+# Применяем конфигурацию и собираем пакеты с подробным выводом
 RUN make defconfig && \
-    make package/feeds/luci/luci-po/host/compile && \
+    make -j1 V=sc && \
     make package/podkop/compile && \
-    make package/luci-app-podkop/compile V=s -j4
+    make package/luci-app-podkop/compile V=s
