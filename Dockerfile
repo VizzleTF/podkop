@@ -10,4 +10,4 @@ COPY ./luci-i18n-podkop-ru /builder/package/feeds/luci/luci-i18n-podkop-ru
 
 RUN ./scripts/feeds update -i
 
-RUN make defconfig && make package/podkop/compile && make package/luci-app-podkop/compile && make package/feeds/luci/luci-i18n-podkop-ru/compile V=s
+RUN make defconfig && make package/podkop/compile && make package/luci-app-podkop/compile V=sc && make package/feeds/luci/luci-i18n-podkop-ru/compile V=s
