@@ -3,6 +3,8 @@
 
 include $(TOPDIR)/rules.mk
 
+LUCI_LANG:=ru
+
 PKG_NAME:=luci-app-podkop
 PKG_VERSION:=0.2.3
 PKG_RELEASE:=1

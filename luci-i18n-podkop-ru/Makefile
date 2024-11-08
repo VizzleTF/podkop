@@ -1,5 +1,7 @@
 include $(TOPDIR)/rules.mk
 
+LUCI_LANG:=ru
+
 PKG_NAME:=luci-i18n-podkop-ru
 PKG_VERSION:=$(PKG_VERSION)
 
