@@ -23,13 +23,14 @@ PKG_MAINTAINER:=CN_SZTL <cnsztl@project-openwrt.eu.org>
 PKG_BUILD_PARALLEL:=1
 PKG_INSTALL:=1
 
+include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
 
 define Package/quickjs
 	SECTION:=lib
 	CATEGORY:=Libraries
 	URL:=https://bellard.org/quickjs
-	TITLE:=A small and embeddable Javascript engine.
+	TITLE:=A small and embeddable Javascript engine
 	DEPENDS:=+libatomic +libpthread
 endef
 
@@ -39,13 +40,31 @@ define Package/quickjs/description
 endef
 
 MAKE_FLAGS += \
-	QJSC_CC="$(HOSTCC_NOCACHE)" \
+	PREFIX=/usr \
+	CONFIG_PREFIX=/usr \
+	HOST_CFLAGS="$(HOST_CFLAGS)" \
+	HOST_LDFLAGS="$(HOST_LDFLAGS)" \
 	CROSS_PREFIX="$(TARGET_CROSS)"
+
+define Build/Prepare
+	$(call Build/Prepare/Default)
+	$(SED) 's,-fhonour-copts,,g' $(PKG_BUILD_DIR)/Makefile
+endef
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/lib $(1)/usr/include
-	$(CP) $(PKG_INSTALL_DIR)/usr/local/lib/quickjs $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/local/include/quickjs $(1)/usr/include
+	$(CP) $(PKG_BUILD_DIR)/libquickjs.a $(1)/usr/lib
+	$(CP) $(PKG_BUILD_DIR)/quickjs.h $(1)/usr/include
+	$(CP) $(PKG_BUILD_DIR)/quickjs-libc.h $(1)/usr/include
 endef
 
+define Package/quickjs/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_BUILD_DIR)/libquickjs.so* $(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/qjs $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/qjsc $(1)/usr/bin/
+endef
+
+$(eval $(call HostBuild))
 $(eval $(call BuildPackage,quickjs))
