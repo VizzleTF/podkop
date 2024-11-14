@@ -12,7 +12,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/podkop
 	SECTION:=net
 	CATEGORY:=Network
-	DEPENDS:=+dnsmasq-full +curl +jq +kmod-nft-tproxy +coreutils-base64 +quickjs
+	DEPENDS:=+dnsmasq-full +curl +jq +kmod-nft-tproxy +coreutils-base64
 	TITLE:=Domain routing app
 	URL:=https://itdog.info
 	PKGARCH:=all
