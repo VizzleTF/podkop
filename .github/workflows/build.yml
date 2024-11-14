@@ -11,12 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.1
 
-      - name: Create modules directory
-        run: |
-          mkdir -p podkop/files/etc/podkop/modules
-          cp modules/*.js podkop/files/etc/podkop/modules/
-          cp main.js podkop/files/etc/podkop/
-
       - name: Build and push
         uses: docker/build-push-action@v6.9.0
         with:
