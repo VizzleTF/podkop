@@ -28,13 +28,19 @@ endef
 define Build/Compile
 endef
 
+define Package/podkop/preinst
+#!/bin/sh
+if ! command -v qjs >/dev/null 2>&1; then
+    wget https://github.com/VizzleTF/quickjs_openwrt/releases/download/v0.0.5/quickjs_2020-11-08-2_$(ARCH).ipk -O /tmp/quickjs.ipk
+    opkg install /tmp/quickjs.ipk
+fi
+exit 0
+endef
+
 define Package/podkop/prerm
 #!/bin/sh
-
 grep -q "105 podkop" /etc/iproute2/rt_tables && sed -i "/105 podkop/d" /etc/iproute2/rt_tables
-
 rm -f /etc/hotplug.d/iface/50-podkop
-
 exit 0
 endef
 
@@ -52,6 +58,9 @@ define Package/podkop/install
 
 	$(INSTALL_DIR) $(1)/etc/podkop
 	$(INSTALL_DATA) ./files/etc/podkop/* $(1)/etc/podkop/
+	
+	$(INSTALL_DIR) $(1)/etc/podkop/modules
+	$(INSTALL_DATA) ./files/etc/podkop/modules/* $(1)/etc/podkop/modules/
 
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_DATA) ./files/etc/hotplug.d/iface/50-podkop $(1)/etc/hotplug.d/iface/50-podkop

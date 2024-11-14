@@ -11,6 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.1
 
+      - name: Create modules directory
+        run: |
+          mkdir -p podkop/files/etc/podkop/modules
+          cp modules/*.js podkop/files/etc/podkop/modules/
+          cp main.js podkop/files/etc/podkop/
+
       - name: Build and push
         uses: docker/build-push-action@v6.9.0
         with:
@@ -27,9 +33,7 @@ jobs:
 
       - name: Filter IPK files
         run: |
-          # Извлекаем версию из тега, убирая префикс 'v'
           VERSION=${GITHUB_REF#refs/tags/v}
-
           mkdir -p ./filtered-bin
           cp ./bin/luci-i18n-podkop-ru_*.ipk "./filtered-bin/luci-i18n-podkop-ru_${VERSION}.ipk"
           cp ./bin/podkop_*.ipk ./filtered-bin/
