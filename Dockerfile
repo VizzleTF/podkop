@@ -6,7 +6,7 @@ RUN ./scripts/feeds update -a && \
     mkdir -p /builder/package/feeds/luci/
 
 # Install quickjs from custom repo
-RUN wget https://github.com/VizzleTF/quickjs_openwrt/releases/download/v0.0.5/quickjs_2020-11-08-2_x86_64.ipk -O /tmp/quickjs.ipk && \
+RUN wget https://github.com/VizzleTF/quickjs_openwrt/releases/download/v0.0.5/quickjs_2020-11-08-2_aarch64_cortex-a53.ipk -O /tmp/quickjs.ipk && \
     opkg install /tmp/quickjs.ipk
 
 COPY ./podkop /builder/package/feeds/utilites/podkop

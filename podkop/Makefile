@@ -31,7 +31,7 @@ endef
 define Package/podkop/preinst
 #!/bin/sh
 if ! command -v qjs >/dev/null 2>&1; then
-    wget https://github.com/VizzleTF/quickjs_openwrt/releases/download/v0.0.5/quickjs_2020-11-08-2_$(ARCH).ipk -O /tmp/quickjs.ipk
+    wget https://github.com/VizzleTF/quickjs_openwrt/releases/download/v0.0.5/quickjs_2020-11-08-2_aarch64_cortex-a53.ipk -O /tmp/quickjs.ipk
     opkg install /tmp/quickjs.ipk
 fi
 exit 0
