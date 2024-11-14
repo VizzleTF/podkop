@@ -1,7 +1,7 @@
 FROM openwrt/sdk:x86_64-v23.05.5
 
 RUN ./scripts/feeds update -a && \
-    ./scripts/feeds install -a && \
+    ./scripts/feeds install luci-base && \
     mkdir -p /builder/package/feeds/utilites/ && \
     mkdir -p /builder/package/feeds/luci/ && \
     wget https://github.com/VizzleTF/quickjs_openwrt/releases/download/v0.0.5/quickjs_2020-11-08-2_aarch64_cortex-a53.ipk -O quick.ipk && \
