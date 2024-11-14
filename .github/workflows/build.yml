@@ -23,16 +23,18 @@ jobs:
         run: |
           docker cp podkop:/builder/bin/packages/x86_64/utilites/. ./bin/
           docker cp podkop:/builder/bin/packages/x86_64/luci/. ./bin/
+          docker cp podkop:/builder/bin/packages/x86_64/libs/. ./bin/
 
       - name: Filter IPK files
         run: |
-          # Извлекаем версию из тега, убирая префикс 'v'
+          # Extract version from tag, removing 'v' prefix
           VERSION=${GITHUB_REF#refs/tags/v}
 
           mkdir -p ./filtered-bin
           cp ./bin/luci-i18n-podkop-ru_*.ipk "./filtered-bin/luci-i18n-podkop-ru_${VERSION}.ipk"
           cp ./bin/podkop_*.ipk ./filtered-bin/
           cp ./bin/luci-app-podkop_*.ipk ./filtered-bin/
+          cp ./bin/quickjs_*.ipk ./filtered-bin/
 
       - name: Remove Docker container
         run: docker rm podkop
