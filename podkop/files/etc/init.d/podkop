@@ -367,6 +367,17 @@ remove_cron_job() {
 }
 
 list_update() {
+    # Main domains processing
+    config_get_bool domain_list_enabled "main" "domain_list_enabled" "0"
+    if [ "$domain_list_enabled" -eq 1 ]; then
+        log "Adding a common domains list"
+        add_set "podkop_domains" "main"
+        config_get domain_list main "domain_list"
+        lists_domains_download "$domain_list"
+        dnsmasq_config_check podkop-domains.lst
+    fi
+
+    # Main custom domains processing
     config_get custom_domains_list_type "main" "custom_domains_list_enabled" "disabled"
     if [ "$custom_domains_list_type" != "disabled" ]; then
         log "Adding a custom domains list"
@@ -383,15 +394,7 @@ list_update() {
         dnsmasq_config_check podkop-custom-domains.lst
     fi
 
-    config_get_bool custom_domains_list_enabled "main" "custom_domains_list_enabled" "0"
-    if [ "$custom_domains_list_enabled" -eq 1 ]; then
-        log "Adding a custom domains list"
-        add_set "podkop_domains" "main"
-        rm -f /tmp/dnsmasq.d/podkop-custom-domains.lst
-        config_list_foreach main custom_domains "list_custom_domains_create" "podkop"
-        dnsmasq_config_check podkop-custom-domains.lst
-    fi
-
+    # Main custom download domains
     config_get_bool custom_download_domains_list_enabled "main" "custom_download_domains_list_enabled" "0"
     if [ "$custom_download_domains_list_enabled" -eq 1 ]; then
         log "Adding a custom domains list from URL"
@@ -399,6 +402,7 @@ list_update() {
         config_list_foreach main custom_download_domains "list_custom_download_domains_create" "podkop"
     fi
 
+    # Main domains delist
     config_get_bool delist_domains_enabled "main" "delist_domains_enabled" "0"
     if [ "$delist_domains_enabled" -eq 1 ] && [ "$domain_list_enabled" -eq 1 ]; then
         log "Exclude domains from the common list"
@@ -406,40 +410,7 @@ list_update() {
         dnsmasq_config_check podkop-domains.lst
     fi
 
-    if [ "$domain_list_enabled" -eq 1 ] || [ "$custom_domains_list_enabled" -eq 1 ]; then
-        /etc/init.d/dnsmasq restart
-    fi
-
-    config_get second_custom_domains_list_enabled "second" "second_custom_domains_list_enabled" "disabled"
-    if [ "$second_custom_domains_list_enabled" != "disabled" ]; then
-        log "Adding a custom domains list. Second podkop"
-        add_set "podkop2_domains" "second"
-        rm -f /tmp/dnsmasq.d/podkop2-custom-domains.lst
-        
-        if [ "$second_custom_domains_list_enabled" = "dynamic" ]; then
-            config_list_foreach second second_custom_domains "list_custom_domains_create" "podkop2"
-        elif [ "$second_custom_domains_list_enabled" = "text" ]; then
-            config_get second_custom_domains_text second "second_custom_domains_text"
-            process_domains_text "$second_custom_domains_text" "podkop2"
-        fi
-        
-        dnsmasq_config_check podkop2-custom-domains.lst
-    fi
-
-    config_get_bool second_domain_service_enabled "second" "second_domain_service_enabled" "0"
-    if [ "$second_domain_service_enabled" -eq 1 ]; then
-        log "Adding a service for podkop2"
-        add_set "podkop2_domains" "second"
-        config_get second_service_list second "second_service_list"
-        lists_services_download "$second_service_list"
-        config_list_foreach second second_custom_domains "list_delist_domains"
-        dnsmasq_config_check podkop2-domains.lst
-    fi
-
-    if [ "$second_custom_domains_list_enabled" -eq 1 ] || [ "$second_domain_service_enabled" -eq 1 ]; then
-        /etc/init.d/dnsmasq restart
-    fi
-
+    # Main subnets processing
     config_get_bool subnets_list_enabled "main" "subnets_list_enabled" "0"
     if [ "$subnets_list_enabled" -eq 1 ]; then
         log "Adding a subnets from list"
@@ -448,14 +419,7 @@ list_update() {
         config_list_foreach main subnets "list_subnets_download"
     fi
 
-    config_get_bool custom_download_subnets_list_enabled "main" "custom_download_subnets_list_enabled" "0"
-    if [ "$custom_download_subnets_list_enabled" -eq 1 ]; then
-        log "Adding a subnets from URL"
-        mkdir -p /tmp/podkop
-        add_set "podkop_subnets" "main"
-        config_list_foreach main custom_download_subnets "list_subnets_download"
-    fi
-
+    # Main custom subnets
     config_get custom_subnets_list_type "main" "custom_subnets_list_enabled" "disabled"
     if [ "$custom_subnets_list_type" != "disabled" ]; then
         log "Adding a custom subnets list"
@@ -469,17 +433,63 @@ list_update() {
         fi
     fi
 
-    config_get_bool second_custom_subnets_list_enabled "second" "second_custom_subnets_list_enabled" "disabled"
-    if [ "$second_custom_subnets_list_enabled" != "disabled" ]; then
+    # Main custom download subnets
+    config_get_bool custom_download_subnets_list_enabled "main" "custom_download_subnets_list_enabled" "0"
+    if [ "$custom_download_subnets_list_enabled" -eq 1 ]; then
+        log "Adding a subnets from URL"
+        mkdir -p /tmp/podkop
+        add_set "podkop_subnets" "main"
+        config_list_foreach main custom_download_subnets "list_subnets_download"
+    fi
+
+    # Second custom domains processing
+    config_get second_custom_domains_list_type "second" "second_custom_domains_list_enabled" "disabled"
+    if [ "$second_custom_domains_list_type" != "disabled" ]; then
+        log "Adding a custom domains list. Second podkop"
+        add_set "podkop2_domains" "second"
+        rm -f /tmp/dnsmasq.d/podkop2-custom-domains.lst
+        
+        if [ "$second_custom_domains_list_type" = "dynamic" ]; then
+            config_list_foreach second second_custom_domains "list_custom_domains_create" "podkop2"
+        elif [ "$second_custom_domains_list_type" = "text" ]; then
+            config_get second_custom_domains_text second "second_custom_domains_text"
+            process_domains_text "$second_custom_domains_text" "podkop2"
+        fi
+        
+        dnsmasq_config_check podkop2-custom-domains.lst
+    fi
+
+    # Second service domains
+    config_get_bool second_domain_service_enabled "second" "second_domain_service_enabled" "0"
+    if [ "$second_domain_service_enabled" -eq 1 ]; then
+        log "Adding a service for podkop2"
+        add_set "podkop2_domains" "second"
+        config_get second_service_list second "second_service_list"
+        lists_services_download "$second_service_list"
+        config_list_foreach second second_custom_domains "list_delist_domains"
+        dnsmasq_config_check podkop2-domains.lst
+    fi
+
+    # Second custom subnets
+    config_get second_custom_subnets_list_type "second" "second_custom_subnets_list_enabled" "disabled"
+    if [ "$second_custom_subnets_list_type" != "disabled" ]; then
         log "Adding a custom subnets list. Second"
         add_set "podkop2_subnets" "second"
         
-        if [ "$second_custom_subnets_list_enabled" = "dynamic" ]; then
+        if [ "$second_custom_subnets_list_type" = "dynamic" ]; then
             config_list_foreach second second_custom_subnets list_custom_subnets_preprocess "podkop2"
-        elif [ "$second_custom_subnets_list_enabled" = "text" ]; then
+        elif [ "$second_custom_subnets_list_type" = "text" ]; then
             config_get second_custom_subnets_text second "second_custom_subnets_text"
             process_subnets_text "$second_custom_subnets_text" "podkop2"
         fi
+    fi
+
+    # Restart dnsmasq if needed
+    if [ "$domain_list_enabled" -eq 1 ] || [ "$custom_domains_list_type" != "disabled" ] || \
+       [ "$custom_download_domains_list_enabled" -eq 1 ] || \
+       [ "$second_custom_domains_list_type" != "disabled" ] || \
+       [ "$second_domain_service_enabled" -eq 1 ]; then
+        /etc/init.d/dnsmasq restart
     fi
 }
 
